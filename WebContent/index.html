@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+		<link rel="stylesheet" media="screen" type="text/css"
+			href="myStyle.css" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+			<link rel="stylesheet"
+				href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+				<script
+					src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+				<script
+					src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+				<script
+					src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>			
+		<title>Index</title> <script src="jquery-3.2.1.min.js"></script>
+		<script>
+			function chargerContenu(e) {
+				var x = e.target.id;
+				if (x == "mesAnnonces") {
+					$("#content").text("");
+					$
+							.post(
+									"MyServlet",
+									{
+										op : "mesAnnonces"
+									},
+									function(data, status) {
+										if (status != 200) {
+											$("#content").append("Veuillez vous connecter");
+										}
+										else {
+											var arr = $.parseJSON(data);
+											for (var i = 0; i < arr.length; i++) {
+												$("#content")
+														.append(
+																arr[i].adresse
+																		+ ' '
+																		+ arr[i].prixHeure
+																		+ ':<br>--- <span id="idAnnonce'+arr[i].id+'"></span><br>');
+											}
+									}
+									});
+					return true;
+				} else if (x == "mesReservations") {
+					$("#content").text("");
+					$
+							.post(
+									"MyServlet",
+									{
+										op : "mesReservations"
+									},
+									function(data, status) {
+										if (status != 200) {
+											$("#content").append("Veuillez vous connecter");
+										}
+										else {
+											var arr = $.parseJSON(data);
+											for (var i = 0; i < arr.length; i++) {
+												$("#content")
+														.append(
+																arr[i].dateEntree
+																		+ ' '
+																		+ arr[i].dateSortie
+																		+ ':<br>--- <span id="idAnnonce' + arr[i].idAnnonce + '"></span><br>');
+											}
+										}	
+									});
+					return true;
+				}
+				
+				else {
+					$("#content").load(x.concat(".html"));
+				}
+			}
+
+			function validerAjouterUtilisateur() {
+
+				$
+						.post(
+								"MyServlet",
+								{
+									nom : document.forms["formAjouterUtilisateur"]["nom"].value,
+									prenom : document.forms["formAjouterUtilisateur"]["prenom"].value,
+									email : document.forms["formAjouterUtilisateur"]["email"].value,
+									mdp : document.forms["formAjouterUtilisateur"]["mdp"].value,
+									op : "ajouterUtilisateur"
+								}, function(data, status) {
+									if (status != 200) {
+										$("#content").text("Erreur");
+										
+									}
+									else {
+										$("#content").text("Utilisateur ajouté avec succès");
+									}
+								});
+				return false;
+			}
+
+			function validerAjouterAnnonce() {
+				$
+						.post(
+								"MyServlet",
+								{
+									latitude : document.forms["formAjouterAnnonce"]["latitude"].value,
+									longitude : document.forms["formAjouterAnnonce"]["longitude"].value,
+									prixHeure : document.forms["formAjouterAnnonce"]["prixHeure"].value,
+									adresse : document.forms["formAjouterAnnonce"]["adresse"].value,
+									op : "ajouterAnnonce"
+								}, function(data, status) {
+									$("#content").text(data);
+								});
+				return false;
+			}
+
+			function connecter() {
+				$
+						.post(
+								"MyServlet",
+								{
+									email : document.forms["formConnecter"]["connexion"].value,
+									mdp : document.forms["formConnecter"]["idadresse"].value,
+									op : "connexion"
+								}, function(data, status) {
+									if (status != 200) {
+										$("#content").text("Erreur");
+										
+									}
+									else {
+										$("#content").text("Vous êtes maintenant connecté");
+									}
+								});
+				return false;
+			}
+			
+			$(document)
+			.ready(
+					function() {
+						document.getElementById("content").innerHTML = "Gestion Parking";
+					});			
+		</script>
+</head>
+<body>
+
+	<nav class="navbar navbar-inverse">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="#">TP</a>
+		</div>
+		<ul class="nav navbar-nav">
+			<li id="accueil-li" class="active"><a
+				onclick="chargerContenu(event)" id="accueil" href="#">Accueil</a></li>
+			<li id="connexion-li"><a onclick="chargerContenu(event)"
+				id="connexion" href="#">Se connecter</a></li>
+			<li id="annonces-li"><a onclick="chargerContenu(event)"
+				id="annonces" href="#">Afficher les annonces</a></li>
+			<li id="annoncesLibres-li"><a onclick="chargerContenu(event)"
+				id="annoncesLibres" href="#">Afficher les annonces libres</a></li>
+			<li id="ajouterUtilisateur-li"><a onclick="chargerContenu(event)"
+				id="ajouterUtilisateur" href="#">Ajouter utilisateur</a></li>
+			<li id="ajouterReservation-li"><a onclick="chargerContenu(event)"
+				id="ajouterReservation" href="#">Ajouter réservation</a></li>
+			<li id="ajouterAnnonce-li"><a onclick="chargerContenu(event)"
+				id="ajouterAnnonce" href="#">Ajouter annonce</a></li>
+			<li id="mesReservations-li"><a onclick="chargerContenu(event)"
+				id="mesReservations" href="#">Mes réservations</a></li>
+			<li id="mesAnnonces-li"><a onclick="chargerContenu(event)"
+				id="mesAnnonces" href="#">Mes annonces</a></li>
+
+				
+		</ul>
+	</div>
+	</nav>
+	<div id="content" class="container-fluid"></div>
+
+</body>
+</html>
