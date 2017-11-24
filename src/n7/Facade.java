@@ -29,7 +29,19 @@ public class Facade {
 	}
 	
 	public Utilisateur utilisateur(int idUtilisateur) {
-		Utilisateur u = em.find(Utilisateur.class, idUtilisateur);
+		Utilisateur u = null;
+		
+		try {
+
+		u = em.find(Utilisateur.class, idUtilisateur);
+
+		}
+
+
+		catch (Exception e) {
+			e.printStack();
+		}
+
 		return u;
 	}
 	
