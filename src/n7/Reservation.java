@@ -8,6 +8,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 @Entity
@@ -15,11 +17,13 @@ public class Reservation {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	int id;
-	Date dateEntree; // timestamp
+	
+	@Temporal(TemporalType.TIMESTAMP) 
+	Date dateEntree;
+	
+	@Temporal(TemporalType.TIMESTAMP) 
 	Date dateSortie;
 	
-	
-
 	
 	@ManyToOne
 	Annonce annonce;

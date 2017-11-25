@@ -3,6 +3,7 @@ package n7;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -23,11 +24,11 @@ public class Utilisateur {
 	
 	String prenom;
 	
-	@OneToMany(mappedBy="proprietaire", fetch = FetchType.LAZY)
-	Collection<Annonce> annonces;	
+	@OneToMany(mappedBy="proprietaire", fetch = FetchType.EAGER)
+	Set<Annonce> annonces;	
 
-	@OneToMany(mappedBy="locataire", fetch = FetchType.LAZY)
-	Collection<Reservation> reservations;	
+	@OneToMany(mappedBy="locataire", fetch = FetchType.EAGER)
+	Set<Reservation> reservations;	
 	
 	public Utilisateur() {}
 	
@@ -49,16 +50,16 @@ public class Utilisateur {
 	}
 	
 	
-	public Collection<Annonce> getAnnonces() {
+	public Set<Annonce> getAnnonces() {
 		return annonces;
 	}
-	public void setAnnonces(Collection<Annonce> annonces) {
+	public void setAnnonces(Set<Annonce> annonces) {
 		this.annonces = annonces;
 	}
-	public Collection<Reservation> getReservations() {
+	public Set<Reservation> getReservations() {
 		return reservations;
 	}
-	public void setReservations(Collection<Reservation> reservations) {
+	public void setReservations(Set<Reservation> reservations) {
 		this.reservations = reservations;
 	}
 

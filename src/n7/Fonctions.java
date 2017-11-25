@@ -30,5 +30,11 @@ public class Fonctions {
 	static String dateToString(Date date) {
 		return formatter.format(date);
 	}
+	
+	public static void main(String[] args) {
+		String dateStr = "24/12/2017";
+		Date date = stringToDate(dateStr);
+		System.out.println(date);
+	}
 
 }

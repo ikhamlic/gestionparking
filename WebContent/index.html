@@ -28,23 +28,55 @@
 										op : "mesAnnonces"
 									},
 									function(data, status) {
-										if (status != 200) {
+										if (data == "erreur") {
 											$("#content").append("Veuillez vous connecter");
 										}
 										else {
 											var arr = $.parseJSON(data);
 											for (var i = 0; i < arr.length; i++) {
 												$("#content")
-														.append(
-																arr[i].adresse
-																		+ ' '
-																		+ arr[i].prixHeure
-																		+ ':<br>--- <span id="idAnnonce'+arr[i].id+'"></span><br>');
+														.append('Adresse: '
+																+ arr[i].adresse
+																+ '// Prix heure: '
+																+ arr[i].prixHeure
+																+ '// ID Annonce: '
+																+ arr[i].id
+																		+ '<br/>');
 											}
 									}
 									});
 					return true;
-				} else if (x == "mesReservations") {
+				} else 	if (x == "annonces") {
+					$("#content").text("");
+					$
+							.post(
+									"MyServlet",
+									{
+										op : "listeAnnonces"
+									},
+									function(data, status) {
+										if (data == "erreur") {
+											$("#content").append("erreur");
+										}
+										else {
+											var arr = $.parseJSON(data);
+											for (var i = 0; i < arr.length; i++) {
+												$("#content")
+														.append('Adresse: '
+																+ arr[i].adresse
+																		+ '// Prix heure: '
+																		+ arr[i].prixHeure
+																		+ '// ID Annonce: '
+																		+ arr[i].id
+																		
+																		+ '<br/>');
+											}
+									}
+									});
+					return true;
+				}
+				
+				else if (x == "mesReservations") {
 					$("#content").text("");
 					$
 							.post(
@@ -53,18 +85,20 @@
 										op : "mesReservations"
 									},
 									function(data, status) {
-										if (status != 200) {
+										if (data == "erreur") {
 											$("#content").append("Veuillez vous connecter");
 										}
 										else {
 											var arr = $.parseJSON(data);
 											for (var i = 0; i < arr.length; i++) {
 												$("#content")
-														.append(
-																arr[i].dateEntree
-																		+ ' '
+														.append( '// Date entrée'
+																		+ arr[i].dateEntree
+																		+ '// Date sortie' 
 																		+ arr[i].dateSortie
-																		+ ':<br>--- <span id="idAnnonce' + arr[i].idAnnonce + '"></span><br>');
+																		+ '// ID Annonce: ' 
+																		+ arr[i].idAnnonce
+																		+ '<br/>');
 											}
 										}	
 									});
@@ -88,7 +122,7 @@
 									mdp : document.forms["formAjouterUtilisateur"]["mdp"].value,
 									op : "ajouterUtilisateur"
 								}, function(data, status) {
-									if (status != 200) {
+									if (data == "erreur") {
 										$("#content").text("Erreur");
 										
 									}
@@ -114,17 +148,32 @@
 								});
 				return false;
 			}
-
-			function connecter() {
+			
+			function validerAjouterReservation() {
 				$
 						.post(
 								"MyServlet",
 								{
-									email : document.forms["formConnecter"]["connexion"].value,
-									mdp : document.forms["formConnecter"]["idadresse"].value,
+									idAnnonce : document.forms["formAjouterReservation"]["idAnnonce"].value,
+									dateDebut : document.forms["formAjouterReservation"]["dateDebut"].value,
+									dateFin : document.forms["formAjouterReservation"]["dateFin"].value,
+									op : "ajouterReservation"
+								}, function(data, status) {
+									$("#content").text(data);
+								});
+				return false;
+			}
+
+			function validerConnexion() {
+				$
+						.post(
+								"MyServlet",
+								{
+									email : document.forms["formConnexion"]["email"].value,
+									mdp : document.forms["formConnexion"]["mdp"].value,
 									op : "connexion"
 								}, function(data, status) {
-									if (status != 200) {
+									if (data == "erreur") {
 										$("#content").text("Erreur");
 										
 									}

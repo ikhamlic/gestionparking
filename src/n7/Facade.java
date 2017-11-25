@@ -6,6 +6,7 @@ import java.util.Date;
 
 import javax.ejb.Singleton;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
@@ -29,8 +30,9 @@ public class Facade {
 	}
 	
 	public Utilisateur utilisateur(int idUtilisateur) {
-		Utilisateur u = em.find(Utilisateur.class, idUtilisateur);
-		return u;
+
+		return em.find(Utilisateur.class, idUtilisateur);
+
 	}
 	
 	public Collection<Annonce> listeAnnonces() {
@@ -38,8 +40,9 @@ public class Facade {
 	}
 	
 	public Annonce annonce(int idAnnonce) {
-		Annonce a = em.find(Annonce.class, idAnnonce);
-		return a;
+		return em.find(Annonce.class, idAnnonce);
+
+
 	}
 	
 	public Collection<Annonce> listeAnnoncesUtilisateur(int idUtilisateur) {
@@ -91,16 +94,23 @@ public class Facade {
 		em.persist(a);
 	}	
 	
-	public void ajouterReservation(int idFuturLocataire, int idAnnonce, Date debut, Date fin) throws Exception {
-		if (estOccupee(idAnnonce, debut, fin))
-			throw new Exception("La place n'est pas libre durant la période sélectionnée");
+	public boolean ajouterReservation(int idFuturLocataire, int idAnnonce, Date debut, Date fin) {
+
+		if (annonce(idAnnonce) == null || estOccupee(idAnnonce, debut, fin))
+			return false;
 			
 		Reservation r = new Reservation();
 		r.setIdLocataire(idFuturLocataire);
 		r.setIdAnnonce(idAnnonce);
+		r.setDateEntree(debut);
+		r.setDateSortie(fin);
+		r.setIdAnnonce(idAnnonce);
 		
 		r.setLocataire(utilisateur(idFuturLocataire));
+		r.setAnnonce(annonce(idAnnonce));
 		em.persist(r);
+		
+		return true;
 		
 	}
 	
@@ -146,28 +156,42 @@ public class Facade {
 		annonce(idAnnonce).desactiver();
 	}
 	
-	public boolean authentifier(String nomUtilisateur, String mdp) {
-		Utilisateur u =  (Utilisateur) em.createQuery("from Utilisateur where nom = :nomUtilisateur")
-				.setParameter("nom", nomUtilisateur)
-				.getSingleResult();
+	public boolean authentifier(String email, String mdp) {
+
 		
-		if (u == null || !u.getMotDePasseHash().equals(Fonctions.hash(mdp)))
+
+		Query q = em.createQuery("from Utilisateur where email = :email")
+					.setParameter("email", email);
+		
+		if (q.getResultList().isEmpty())
 			return false;
 		
+
+		Utilisateur u = (Utilisateur) q.getSingleResult();
 		
-		return true;
+		if (u.getMotDePasseHash().equals(Fonctions.hash(mdp)))
+			return true;
+		else
+			return false;
+					
+			
+		
+		
 	}
 	
 	public int idUtilisateur(String emailUtilisateur) {
-		Utilisateur u =  (Utilisateur) em.createQuery("from Utilisateur where email = :emailUtilisateur")
-				.setParameter("emailUtilisateur", emailUtilisateur)
-				.getSingleResult();
+
+		Query q = em.createQuery("from Utilisateur where email = :emailUtilisateur")
+					.setParameter("emailUtilisateur", emailUtilisateur);
+			
+		if (q.getResultList().isEmpty())
+				return -1;
+		else {
+			Utilisateur u = (Utilisateur) q.getSingleResult();
+			return u.getId();
+		}
 		
-		if (u == null)
-			return -1;
-		
-		
-		return u.getId();
+
 	}
 	
 

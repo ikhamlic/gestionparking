@@ -16,7 +16,7 @@ import com.sun.accessibility.internal.resources.accessibility;
 import com.sun.jndi.cosnaming.IiopUrl.Address;
 
 
-//TODO A REFACTORISER
+//TODO A REFACTORISER (bcp de redondances)
 //TODO Documenter les codes statuts
 //TODO ajouter des apis pour les autres méthodes de facade (supprimer une annonce, etc..)
 /**
@@ -42,25 +42,25 @@ public class MyServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if (request.getParameter("op").equals("ajouterUtilisateur")) {
-			if (f.idUtilisateur(request.getParameter("email")) == -1)
-				response.setStatus(500);
+			if (f.idUtilisateur(request.getParameter("email")) != -1) // <=> utilisateur déjà existant
+				response.getWriter().write("erreur");
 			else {
 				f.ajouterUtilisateur(request.getParameter("email"), request.getParameter("mdp"), request.getParameter("nom"), request.getParameter("prenom"));
 				HttpSession sess = request.getSession(true);
 				sess.setAttribute("idUtilisateur", f.idUtilisateur(request.getParameter("email")));
-				response.setStatus(200);
+				response.getWriter().write("succes");
 			}
 		}
 		
 		else if (request.getParameter("op").equals("connexion")) {
 			
-			if (f.authentifier(request.getParameter("email"), request.getParameter("mdp")))
-				response.setStatus(400);
+			if (!f.authentifier(request.getParameter("email"), request.getParameter("mdp")))
+				response.getWriter().write("erreur");
 			
 			else {
 				HttpSession sess = request.getSession(true);
 				sess.setAttribute("idUtilisateur", f.idUtilisateur(request.getParameter("email")));
-				response.setStatus(200);
+				response.getWriter().write("succes");
 			}
 		}
 		
@@ -83,26 +83,31 @@ public class MyServlet extends HttpServlet {
 	   else if (request.getParameter("op").equals("ajouterAnnonce")) {
 			HttpSession sess = request.getSession(true);
 			if (sess.getAttribute("idUtilisateur") == null)
-				response.setStatus(500);
+				response.getWriter().write("Veuillez vous connecter");
 			else {
-				f.ajouterAnnonce(Integer.parseInt((String) sess.getAttribute("idUtilisateur")), Double.parseDouble(request.getParameter("latitude")), Double.parseDouble(request.getParameter("longitude")), Double.parseDouble(request.getParameter("prixHeure")), (String) request.getParameter("adresse"));
-				response.getWriter().write("Annonce ajoutée avec succès.");		
+				f.ajouterAnnonce((Integer) sess.getAttribute("idUtilisateur"), Double.parseDouble(request.getParameter("latitude")), Double.parseDouble(request.getParameter("longitude")), Double.parseDouble(request.getParameter("prixHeure")), (String) request.getParameter("adresse"));
+				response.getWriter().write("succes");		
 			}
 		}
 	   
 	   else if (request.getParameter("op").equals("ajouterReservation")) {
 			HttpSession sess = request.getSession(true);
 			if (sess.getAttribute("idUtilisateur") == null)
-				response.setStatus(500);
+				response.getWriter().write("Veuillez vous connecter");
+			
+			else if (f.utilisateur((Integer) sess.getAttribute("idUtilisateur")).getAnnonces().contains(f.annonce(Integer.parseInt(request.getParameter("idAnnonce")))))
+				response.getWriter().write("erreur"); // l'annonce lui appartient
 			else {
 				try {
-					f.ajouterReservation(Integer.parseInt((String) sess.getAttribute("idUtilisateur")), Integer.parseInt(request.getParameter("idAnnonce")),  Fonctions.stringToDate(request.getParameter("dateDebut")),  Fonctions.stringToDate(request.getParameter("dateFin")));
-					response.getWriter().write("Adresse ajoutée avec succès.");
+					if (f.ajouterReservation((Integer) sess.getAttribute("idUtilisateur"), Integer.parseInt(request.getParameter("idAnnonce")),  Fonctions.stringToDate(request.getParameter("dateDebut")),  Fonctions.stringToDate(request.getParameter("dateFin"))))
+						response.getWriter().write("succes");
+					else
+						response.getWriter().write("occupe");
 				} catch (NumberFormatException e) {
-					response.setStatus(400);
+					response.getWriter().write("erreur");
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
-					response.setStatus(500);
+					response.getWriter().write("erreur");
 				}
 			}
 
@@ -156,7 +161,7 @@ public class MyServlet extends HttpServlet {
 		   HttpSession sess = request.getSession(true);
 		   
 		   if (sess.getAttribute("idUtilisateur") == null)
-			   response.setStatus(401); // Utilisateur non connecté
+				response.getWriter().write("erreur"); // Utilisateur non connecté
 		   
 		   else {
 			   
@@ -177,7 +182,7 @@ public class MyServlet extends HttpServlet {
 		   HttpSession sess = request.getSession(true);
 		   
 		   if (sess.getAttribute("idUtilisateur") == null)
-			   response.setStatus(401); // Utilisateur non connecté
+				response.getWriter().write("erreur"); // Utilisateur non connecté
 		   
 		   else {
 			   

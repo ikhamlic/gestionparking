@@ -1,6 +1,7 @@
 package n7;
 
 import java.util.Collection;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
+
 
 //TODO ajouter autres attributs éventuellements utiles (titre, type véhicule, etc...)
 
@@ -25,8 +27,9 @@ public class Annonce {
 	double adresseLat; // latitude
 	boolean estActive;
 	
-	@OneToMany(mappedBy="annonce", fetch = FetchType.LAZY)
-	Collection<Reservation> reservations;	
+	
+	@OneToMany(mappedBy="annonce", fetch = FetchType.EAGER)
+	Set<Reservation> reservations;	
 	
 	
 
@@ -90,10 +93,10 @@ public class Annonce {
 		return estActive;
 	}
 
-	public Collection<Reservation> getReservations() {
+	public Set<Reservation> getReservations() {
 		return reservations;
 	}
-	public void setReservations(Collection<Reservation> reservations) {
+	public void setReservations(Set<Reservation> reservations) {
 		this.reservations = reservations;
 	}
 	
