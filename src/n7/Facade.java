@@ -89,6 +89,7 @@ public class Facade {
 		a.setAdresseLat(latitude);
 		a.setAdresseLong(longitude);
 		a.setPrixHeure(prixHeure);
+		a.setIdProprietaire(idProprietaire);
 		a.setProprietaire(utilisateur(idProprietaire));
 		a.activer();
 		em.persist(a);
@@ -132,7 +133,7 @@ public class Facade {
 	
 	
 	public boolean estOccupee(Annonce a, Date debut, Date fin) { 
-		
+
 		for (Reservation r: a.getReservations()) {
 			if (!(debut.after(r.getDateSortie()) || fin.before(r.getDateEntree()))) // équivaut à dire que la place n'est pas libre (non(libre) <=> occupé)
 					return true; // la place est occupée durant au moins une partie de la période désirée
@@ -158,8 +159,6 @@ public class Facade {
 	
 	public boolean authentifier(String email, String mdp) {
 
-		
-
 		Query q = em.createQuery("from Utilisateur where email = :email")
 					.setParameter("email", email);
 		
@@ -173,9 +172,6 @@ public class Facade {
 			return true;
 		else
 			return false;
-					
-			
-		
 		
 	}
 	

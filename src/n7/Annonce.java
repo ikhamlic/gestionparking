@@ -13,7 +13,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 
-//TODO ajouter autres attributs éventuellements utiles (titre, type véhicule, etc...)
+//TODO ajouter autres attributs éventuellement utiles (titre, type véhicule, etc...)
 
 @Entity
 public class Annonce {
@@ -36,16 +36,16 @@ public class Annonce {
 	@ManyToOne
 	Utilisateur proprietaire;
 	@Transient
-	int idProprio;//Pour des raisons de programmation, pas stocké dans la bd.
+	int idProprietaire;
 	
-	public Annonce(){
+	public Annonce() {
 		
 	}
-	public int getIdProprio() {
-		return idProprio;
+	public int getIdProprietaire() {
+		return idProprietaire;
 	}
-	public void setIdProprio(int idProprio) {
-		this.idProprio = idProprio;
+	public void setIdProprietaire(int idProprietaire) {
+		this.idProprietaire = idProprietaire;
 	}
 	public int getId() {
 		return id;
