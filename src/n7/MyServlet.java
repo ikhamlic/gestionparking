@@ -17,6 +17,7 @@ import com.sun.jndi.cosnaming.IiopUrl.Address;
 
 
 //TODO A REFACTORISER (bcp de redondances)
+//TODO erreur(out) succes(out)
 //TODO Documenter les codes statuts
 //TODO ajouter des apis pour les autres méthodes de facade (supprimer une annonce, etc..)
 /**
@@ -24,6 +25,7 @@ import com.sun.jndi.cosnaming.IiopUrl.Address;
  */
 @WebServlet("/MyServlet")
 public class MyServlet extends HttpServlet {
+
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -85,7 +87,7 @@ public class MyServlet extends HttpServlet {
 			if (sess.getAttribute("idUtilisateur") == null)
 				response.getWriter().write("Veuillez vous connecter");
 			else {
-				f.ajouterAnnonce((Integer) sess.getAttribute("idUtilisateur"), Double.parseDouble(request.getParameter("latitude")), Double.parseDouble(request.getParameter("longitude")), Double.parseDouble(request.getParameter("prixHeure")), (String) request.getParameter("adresse"));
+				f.ajouterAnnonce((Integer) sess.getAttribute("idUtilisateur"), Double.parseDouble(request.getParameter("latitude")), Double.parseDouble(request.getParameter("longitude")), Double.parseDouble(request.getParameter("prixHeure")), request.getParameter("adresse"));
 				response.getWriter().write("succes");		
 			}
 		}

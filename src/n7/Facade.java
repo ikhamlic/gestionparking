@@ -3,7 +3,6 @@ package n7;
 
 import java.util.Collection;
 import java.util.Date;
-
 import javax.ejb.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -16,7 +15,7 @@ public class Facade {
 	@PersistenceContext
 	EntityManager em;
 	
-	public  void ajouterUtilisateur(String email, String mdp, String nom, String prenom) {
+	public void ajouterUtilisateur(String email, String mdp, String nom, String prenom) {
 		Utilisateur u = new Utilisateur();
 		u.setNom(nom);
 		u.setPrenom(prenom);
@@ -25,14 +24,12 @@ public class Facade {
 		em.persist(u);
 	}
 	
-	public Collection<Utilisateur> listeUtilisateurs(){
+	public Collection<Utilisateur> listeUtilisateurs() {
 		return em.createQuery("from Utilisateur", Utilisateur.class).getResultList();
 	}
 	
 	public Utilisateur utilisateur(int idUtilisateur) {
-
 		return em.find(Utilisateur.class, idUtilisateur);
-
 	}
 	
 	public Collection<Annonce> listeAnnonces() {
@@ -41,8 +38,6 @@ public class Facade {
 	
 	public Annonce annonce(int idAnnonce) {
 		return em.find(Annonce.class, idAnnonce);
-
-
 	}
 	
 	public Collection<Annonce> listeAnnoncesUtilisateur(int idUtilisateur) {
@@ -83,13 +78,14 @@ public class Facade {
 	public Collection<Annonce> listeAnnoncesLibres(Date debut, Date fin) {
 		return filtrerAnnoncesLibres(listeAnnonces(), debut, fin);
 	}
+
 	public void ajouterAnnonce(int idProprietaire, double latitude, double longitude, double prixHeure, String adresse) {
 		Annonce a = new Annonce();
 		a.setAdresse(adresse);
 		a.setAdresseLat(latitude);
 		a.setAdresseLong(longitude);
 		a.setPrixHeure(prixHeure);
-		a.setIdProprietaire(idProprietaire);
+		//a.setIdProprietaire(idProprietaire);
 		a.setProprietaire(utilisateur(idProprietaire));
 		a.activer();
 		em.persist(a);
@@ -101,38 +97,30 @@ public class Facade {
 			return false;
 			
 		Reservation r = new Reservation();
-		r.setIdLocataire(idFuturLocataire);
-		r.setIdAnnonce(idAnnonce);
+
 		r.setDateEntree(debut);
 		r.setDateSortie(fin);
-		r.setIdAnnonce(idAnnonce);
-		
 		r.setLocataire(utilisateur(idFuturLocataire));
 		r.setAnnonce(annonce(idAnnonce));
 		em.persist(r);
 		
 		return true;
-		
 	}
 	
 	//TODO ajouter list annonces distance
 	public boolean estLibre(int idAnnonce, Date debut, Date fin) {
 		return !estOccupee(idAnnonce, debut, fin);
-		
 	}
 	
 	public boolean estLibre(Annonce a, Date debut, Date fin) {
 		return !estOccupee(a, debut, fin);
-		
 	}
 	
 	public boolean estOccupee(int idAnnonce, Date debut, Date fin) { 
 		return estOccupee(annonce(idAnnonce), debut, fin);
 	}
 	
-	
-	
-	public boolean estOccupee(Annonce a, Date debut, Date fin) { 
+	public boolean estOccupee(Annonce a, Date debut, Date fin) {
 
 		for (Reservation r: a.getReservations()) {
 			if (!(debut.after(r.getDateSortie()) || fin.before(r.getDateEntree()))) // équivaut à dire que la place n'est pas libre (non(libre) <=> occupé)
@@ -141,8 +129,6 @@ public class Facade {
 		}
 		
 		return false; // la place est libre du début à la fin de la période désirée
-		
-		
 	}
 	
 	public boolean estLibre(int idAnnonce, Date date) { //TODO à optimiser à l'aide d'un cache (hashset des dates occupées)
@@ -165,14 +151,9 @@ public class Facade {
 		if (q.getResultList().isEmpty())
 			return false;
 		
-
 		Utilisateur u = (Utilisateur) q.getSingleResult();
-		
-		if (u.getMotDePasseHash().equals(Fonctions.hash(mdp)))
-			return true;
-		else
-			return false;
-		
+
+		return u.getMotDePasseHash().equals(Fonctions.hash(mdp));
 	}
 	
 	public int idUtilisateur(String emailUtilisateur) {
@@ -187,7 +168,6 @@ public class Facade {
 			return u.getId();
 		}
 		
-
 	}
 	
 

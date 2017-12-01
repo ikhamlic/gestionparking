@@ -2,18 +2,11 @@ package n7;
 
 import java.util.Date;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 @Entity
 public class Reservation {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	int id;
@@ -26,15 +19,17 @@ public class Reservation {
 	
 	
 	@ManyToOne
+	@JoinColumn(name = "idAnnonce")
 	Annonce annonce;
-	
-	@Transient
+
+	@Column(updatable = false, insertable = false)
 	int idAnnonce;
 	
 	@ManyToOne
+	@JoinColumn(name = "idLocataire")
 	Utilisateur locataire;
 
-	@Transient
+	@Column(updatable = false, insertable = false)
 	int idLocataire;
 	
 	public Reservation() {}
@@ -83,17 +78,10 @@ public class Reservation {
 		return idLocataire;
 	}
 
-	public void setIdLocataire(int idLocataire) {
-		this.idLocataire = idLocataire;
-	}
-
 	public int getIdAnnonce() {
 		return idLocataire;
 	}
 
-	public void setIdAnnonce(int idAnnonce) {
-		this.idAnnonce = idAnnonce;
-	}
 	
 }
 
