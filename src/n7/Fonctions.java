@@ -18,11 +18,9 @@ public class Fonctions {
         try {
 
             date = formatter.parse(dateInString);
-            System.out.println(date);
-            System.out.println(formatter.format(date));
 
         } catch (Exception e) {
-            e.printStackTrace();
+			e.printStackTrace();
         }
 		return date; 
 	}
