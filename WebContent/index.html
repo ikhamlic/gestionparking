@@ -68,8 +68,6 @@
 																		+ arr[i].prixHeure
 																		+ '// ID Annonce: '
 																		+ arr[i].id
-																		+ '// ID Proprietaire'
-																		+ arr[i].idProprietaire
 																		
 																		+ '<br/>');
 											}
@@ -100,13 +98,85 @@
 																		+ arr[i].dateSortie
 																		+ '// ID Annonce: ' 
 																		+ arr[i].idAnnonce
+																		+ '// ID Reservation: ' 
+																		+ arr[i].id
 																		+ '<br/>');
 											}
 										}	
 									});
 					return true;
 				}
-				
+				else 	if (x == "mesMessagesRecus") {
+					$("#content").text("");
+					$
+							.post(
+									"MyServlet",
+									{
+										op : "listerMessagesRecus"
+									},
+									function(data, status) {
+										if (data == "erreur") {
+											$("#content").append("erreur");
+										}
+										else {
+											var arr = $.parseJSON(data);
+											for (var i = 0; i < arr.length; i++) {
+												$("#content")
+												.append( '// Date :'
+																+ arr[i].date
+																+ '// expediteur:' 
+																+ arr[i].idExpediteur
+																+ '// destinataire: ' 
+																+ arr[i].idDestinataire
+																+'// contenu :'
+																+arr[i].contenu
+																+ '<br/>' );}
+									}
+									});
+					return true;
+				}
+				else 	if (x == "mesMessagesEnvoyes") {
+					$("#content").text("");
+					$
+							.post(
+									"MyServlet",
+									{
+										op : "listerMessagesExpedies"
+									},
+									function(data, status) {
+										if (data == "erreur") {
+											$("#content").append("erreur");
+										}
+										else {
+											var arr = $.parseJSON(data);
+											for (var i = 0; i < arr.length; i++) {
+												$("#content")
+												.append( '// Date :'
+																+ arr[i].date
+																+ '// expediteur:' 
+																+ arr[i].idExpediteur
+																+ '// destinataire: ' 
+																+ arr[i].idDestinataire
+																+'// contenu :'
+																+arr[i].contenu
+																+ '<br/>' );}
+									}
+									});
+					return true;
+				}
+				else 	if (x == "deconnexion") {
+					$("#content").text("");
+					$
+							.post(
+									"MyServlet",
+									{
+										op : "deconnexion"
+									},
+									 function(data, status) {
+										$("#content").text(data);
+									});
+					return true;
+				}
 				else {
 					$("#content").load(x.concat(".html"));
 				}
@@ -134,6 +204,93 @@
 								});
 				return false;
 			}
+			
+			function validerAjouterMessage() {
+				$
+					.post(
+								"MyServlet",
+								{
+									idReservation : document.forms["formAjouterMessage"]["idReservation"].value,
+									contenu : document.forms["formAjouterMessage"]["contenu"].value,
+									
+									op : "ajouterMessage"
+								}, function(data, status) {
+									$("#content").text(data);
+								});
+				return false;
+			}
+			function afficherMessages() {
+
+				$
+						.post(
+								"MyServlet",
+								{
+									idReservation : document.forms["formAfficherMessages"]["idReservation"].value,
+
+									op : "listerMessages"
+									
+								}, function(data, status) {
+									if (data == "erreur") {
+										$("#content").text("");
+
+										$("#content").text("Erreur");
+										
+									}
+									else {
+										$("#content").text("");
+										var arr = $.parseJSON(data);
+										for (var i = 0; i < arr.length; i++) {
+											$("#content")
+													.append( '// Date :'
+																	+ arr[i].date
+																	+ '// expediteur:' 
+																	+ arr[i].idExpediteur
+																	+ '// destinataire: ' 
+																	+ arr[i].idDestinataire
+																	+'// contenu :'
+																	+arr[i].contenu
+																	+ '<br/>' );}
+										
+										}
+								});
+				return false;
+			}
+			function afficherReservationsAnnonces() {
+				
+
+				$
+						.post(
+								"MyServlet",
+								{
+									idAnnonce : document.forms["formAfficherReservationsAnnonce"]["idAnnonce"].value,
+
+									op : "mesReservationsAnnonce"
+
+								}, function(data, status) {
+									if (data == "erreur") {
+										$("#content").text("Erreur");
+										
+									}
+									else {
+										var arr = $.parseJSON(data);
+										$("#content").text("");
+										for (var i = 0; i < arr.length; i++) {
+
+											$("#content")
+													.append( '// Date entrée'
+																	+ arr[i].dateEntree
+																	+ '// Date sortie' 
+																	+ arr[i].dateSortie
+																	+ '// ID Annonce: ' 
+																	+ arr[i].idAnnonce
+																	+ '// ID Reservation: ' 
+																	+ arr[i].id
+																	+ '<br/>' );}
+										
+										}
+								});
+				return false;
+			}
 
 			function validerAjouterAnnonce() {
 				$
@@ -153,7 +310,7 @@
 			
 			function validerAjouterReservation() {
 				$
-					.post(
+						.post(
 								"MyServlet",
 								{
 									idAnnonce : document.forms["formAjouterReservation"]["idAnnonce"].value,
@@ -219,7 +376,20 @@
 				id="mesReservations" href="#">Mes réservations</a></li>
 			<li id="mesAnnonces-li"><a onclick="chargerContenu(event)"
 				id="mesAnnonces" href="#">Mes annonces</a></li>
-
+            <li id="reservationsAnnonces-li"><a onclick="chargerContenu(event)"
+				id="ReservationsAnnonce" href="#">Reservations liees a mes annonces</a></li>
+            <li id="ajouterMessage-li"><a onclick="chargerContenu(event)"
+				id="ajouterMessage" href="#">Ajouter Message</a></li>
+			<li id="messages-li"><a onclick="chargerContenu(event)"
+				id="mesMessages" href="#">Afficher Messages</a></li>
+			<li id="messagesRecus-li"><a onclick="chargerContenu(event)"
+				id="mesMessagesRecus" href="#">Messages Recus</a></li>
+			<li id="messagesEnvoyes-li"><a onclick="chargerContenu(event)"
+				id="mesMessagesEnvoyes" href="#">Messages Envoyes</a></li>
+			<li id="deconnexion-li"><a onclick="chargerContenu(event)"
+				id="deconnexion" href="#">Se deconnecter</a></li>
+				
+		</ul>
 
 				
 		</ul>

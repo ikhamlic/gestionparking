@@ -3,6 +3,7 @@ package n7;
 
 import java.util.Collection;
 import java.util.Date;
+
 import javax.ejb.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -15,7 +16,7 @@ public class Facade {
 	@PersistenceContext
 	EntityManager em;
 	
-	public void ajouterUtilisateur(String email, String mdp, String nom, String prenom) {
+	public  void ajouterUtilisateur(String email, String mdp, String nom, String prenom) {
 		Utilisateur u = new Utilisateur();
 		u.setNom(nom);
 		u.setPrenom(prenom);
@@ -29,15 +30,23 @@ public class Facade {
 	}
 	
 	public Utilisateur utilisateur(int idUtilisateur) {
+
 		return em.find(Utilisateur.class, idUtilisateur);
+
 	}
-	
+	public Reservation reservation(int idReservation) {
+
+		return em.find(Reservation.class, idReservation);
+
+	}
 	public Collection<Annonce> listeAnnonces() {
 		return em.createQuery("from Annonce", Annonce.class).getResultList();	
 	}
 	
 	public Annonce annonce(int idAnnonce) {
 		return em.find(Annonce.class, idAnnonce);
+
+
 	}
 	
 	public Collection<Annonce> listeAnnoncesUtilisateur(int idUtilisateur) {
@@ -78,14 +87,12 @@ public class Facade {
 	public Collection<Annonce> listeAnnoncesLibres(Date debut, Date fin) {
 		return filtrerAnnoncesLibres(listeAnnonces(), debut, fin);
 	}
-
 	public void ajouterAnnonce(int idProprietaire, double latitude, double longitude, double prixHeure, String adresse) {
 		Annonce a = new Annonce();
 		a.setAdresse(adresse);
 		a.setAdresseLat(latitude);
 		a.setAdresseLong(longitude);
 		a.setPrixHeure(prixHeure);
-		//a.setIdProprietaire(idProprietaire);
 		a.setProprietaire(utilisateur(idProprietaire));
 		a.activer();
 		em.persist(a);
@@ -97,41 +104,49 @@ public class Facade {
 			return false;
 			
 		Reservation r = new Reservation();
-
 		r.setDateEntree(debut);
 		r.setDateSortie(fin);
+
+		
 		r.setLocataire(utilisateur(idFuturLocataire));
 		r.setAnnonce(annonce(idAnnonce));
 		em.persist(r);
 		
 		return true;
+		
 	}
 	
 	//TODO ajouter list annonces distance
 	public boolean estLibre(int idAnnonce, Date debut, Date fin) {
 		return !estOccupee(idAnnonce, debut, fin);
+		
 	}
 	
 	public boolean estLibre(Annonce a, Date debut, Date fin) {
 		return !estOccupee(a, debut, fin);
+		
 	}
 	
 	public boolean estOccupee(int idAnnonce, Date debut, Date fin) { 
 		return estOccupee(annonce(idAnnonce), debut, fin);
 	}
 	
-	public boolean estOccupee(Annonce a, Date debut, Date fin) {
+	
+	
+	public boolean estOccupee(Annonce a, Date debut, Date fin) { 
 
 		for (Reservation r: a.getReservations()) {
-			if (!(debut.after(r.getDateSortie()) || fin.before(r.getDateEntree()))) // équivaut à dire que la place n'est pas libre (non(libre) <=> occupé)
-					return true; // la place est occupée durant au moins une partie de la période désirée
+			if (!(debut.after(r.getDateSortie()) || fin.before(r.getDateEntree()))) // ?quivaut ? dire que la place n'est pas libre (non(libre) <=> occup?)
+					return true; // la place est occup?e durant au moins une partie de la p?riode d?sir?e
 			
 		}
 		
-		return false; // la place est libre du début à la fin de la période désirée
+		return false; // la place est libre du d?but ? la fin de la p?riode d?sir?e
+		
+		
 	}
 	
-	public boolean estLibre(int idAnnonce, Date date) { //TODO à optimiser à l'aide d'un cache (hashset des dates occupées)
+	public boolean estLibre(int idAnnonce, Date date) { //TODO ? optimiser ? l'aide d'un cache (hashset des dates occup?es)
 		return estLibre(idAnnonce, date, date);
 	}
 	
@@ -151,9 +166,14 @@ public class Facade {
 		if (q.getResultList().isEmpty())
 			return false;
 		
-		Utilisateur u = (Utilisateur) q.getSingleResult();
 
-		return u.getMotDePasseHash().equals(Fonctions.hash(mdp));
+		Utilisateur u = (Utilisateur) q.getSingleResult();
+		
+		if (u.getMotDePasseHash().equals(Fonctions.hash(mdp)))
+			return true;
+		else
+			return false;
+		
 	}
 	
 	public int idUtilisateur(String emailUtilisateur) {
@@ -168,7 +188,75 @@ public class Facade {
 			return u.getId();
 		}
 		
+
 	}
 	
+    public void ajouterMessage(Reservation reservation, Utilisateur expediteur, Utilisateur destinataire, Date date, String contenu) {
+    	
+    	Message m = new Message();
+    	m.setDestinataire(destinataire);
+    	m.setExpediteur(expediteur);
+    	m.setReservation(reservation);
+    	m.setDate(date);
+    	m.setContenu(contenu);
+    	em.persist(m);
+    	    	
+    }
+    
+    
 
+    
+    public boolean ajouterMessage(int idUtilisateur,int idReservation, String contenu) {
+    	
+    	Reservation r = reservation(idReservation);
+    	Utilisateur locataire = r.getLocataire();
+    	Utilisateur proprietaire = r.getAnnonce().getProprietaire();
+    	
+    	Utilisateur expediteur = null;
+    	Utilisateur destinataire = null;
+    	
+    	if (idUtilisateur == locataire.getId()) {
+    		expediteur = locataire;
+    		destinataire = proprietaire;
+    	}
+    	if (idUtilisateur == proprietaire.getId()) {
+    		expediteur = proprietaire;
+    		destinataire = locataire;
+    	}
+    	if(idUtilisateur != locataire.getId() && idUtilisateur != proprietaire.getId())
+    		return false;
+    	
+    	
+    	Date date = Fonctions.today();
+    	
+    	if (expediteur == null || destinataire == null) return false;
+    	
+    	ajouterMessage(r, expediteur,destinataire, date, contenu);
+    	
+    	return true;
+    	
+    	
+    }
+
+    
+    public Collection<Reservation> listerReservationsAnnonce(int idAnnonce) {
+		return annonce(idAnnonce).getReservations();	
+	}
+	
+    public Collection<Message> listerMessageReservation(int idUtilisateur, int idReservation) {
+    	Reservation r = reservation(idReservation);
+    	Utilisateur locataire = r.getLocataire();
+    	Utilisateur proprietaire = r.getAnnonce().getProprietaire();
+    	if(idUtilisateur != locataire.getId() && idUtilisateur != proprietaire.getId())
+    		return null;
+    	
+    	else
+		return reservation(idReservation).getMessages();	
+	}
+    public Collection<Message> listerMessageRecus(int idUtilisateur) {
+		return utilisateur(idUtilisateur).getMessagesRecus();	
+	}
+    public Collection<Message> listerMessageExpedies(int idUtilisateur) {
+		return utilisateur(idUtilisateur).getMessagesExpedies();	
+	}
 }

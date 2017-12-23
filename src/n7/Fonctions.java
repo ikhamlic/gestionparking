@@ -1,11 +1,12 @@
 package n7;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Fonctions {
 	
-	static SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy"); // Ã  changer
+	static SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy"); // à changer
 	
 	static String hash(String mdp) { // TODO hash md5 ou SHA-256
 		return mdp;
@@ -18,9 +19,11 @@ public class Fonctions {
         try {
 
             date = formatter.parse(dateInString);
+            System.out.println(date);
+            System.out.println(formatter.format(date));
 
         } catch (Exception e) {
-			e.printStackTrace();
+            e.printStackTrace();
         }
 		return date; 
 	}
@@ -34,5 +37,12 @@ public class Fonctions {
 		Date date = stringToDate(dateStr);
 		System.out.println(date);
 	}
+	
+
+
+	public static Date today() {
+		return Calendar.getInstance().getTime();
+	}
+
 
 }

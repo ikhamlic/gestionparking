@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 
 
-//TODO ajouter autres attributs éventuellement utiles (titre, type véhicule, etc...)
+//TODO ajouter autres attributs ?ventuellement utiles (titre, type v?hicule, etc...)
 
 @Entity
 public class Annonce {
@@ -21,6 +21,9 @@ public class Annonce {
 	double adresseLong; // longitude
 	double adresseLat; // latitude
 	boolean estActive;
+	String indicationsPrivees;
+
+	
 
 	@Column(updatable = false, insertable = false)
 	int idProprietaire;
@@ -48,9 +51,7 @@ public class Annonce {
 		return id;
 	}
 
-	public void setId(int id) {
-		this.id = id;
-	}
+
 
 	public Utilisateur getProprietaire() {
 		return proprietaire;
@@ -103,7 +104,13 @@ public class Annonce {
 	public void setReservations(Set<Reservation> reservations) {
 		this.reservations = reservations;
 	}
+	public String getIndicationsPrivees() {
+		return indicationsPrivees;
+	}
 
+	public void setIndicationsPrivees(String indicationsPrivees) {
+		this.indicationsPrivees = indicationsPrivees;
+	}
 	public void desactiver() {
 		estActive = false;
 	}

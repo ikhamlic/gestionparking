@@ -11,6 +11,7 @@
         <class>n7.Annonce</class>
         <class>n7.Reservation</class>
         <class>n7.Utilisateur</class>
+        <class>n7.Message</class>
         
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect" />

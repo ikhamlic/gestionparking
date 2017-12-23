@@ -1,12 +1,24 @@
 package n7;
 
 import java.util.Date;
+import java.util.Set;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 @Entity
 public class Reservation {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	int id;
@@ -21,7 +33,7 @@ public class Reservation {
 	@ManyToOne
 	@JoinColumn(name = "idAnnonce")
 	Annonce annonce;
-
+	
 	@Column(updatable = false, insertable = false)
 	int idAnnonce;
 	
@@ -32,15 +44,22 @@ public class Reservation {
 	@Column(updatable = false, insertable = false)
 	int idLocataire;
 	
+
+	@OneToMany(mappedBy="reservation", fetch = FetchType.EAGER)
+	Set<Message> messages;	
+    
+	
+	
+	public void setMessages(Set<Message> messages) {
+		this.messages = messages;
+	}
+
 	public Reservation() {}
 
 	public int getId() {
 		return id;
 	}
 
-	public void setId(int id) {
-		this.id = id;
-	}
 
 	public Date getDateEntree() {
 		return dateEntree;
@@ -78,10 +97,19 @@ public class Reservation {
 		return idLocataire;
 	}
 
+
+
 	public int getIdAnnonce() {
 		return idLocataire;
 	}
 
+
+	public Set<Message> getMessages() {
+		return messages;
+	}
+
+
+	
+	
 	
 }
-
